@@ -28,7 +28,7 @@ Demo of an agent that you can build using this repo!
 
 2. Create your virtual environment
    ```bash
-   python -m venv .venv
+   python3 -m venv .venv
    ```
 
 3. Activate (each new terminal) for macOS/Linux
