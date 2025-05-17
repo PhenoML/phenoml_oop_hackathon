@@ -14,7 +14,6 @@ FHIR_PROFILES = {
     "condition-problems-health-concerns": "Condition",
     "coverage": "Coverage",
     "encounter": "Encounter",
-    "invoice": "Invoice",
     "observation-clinical-result": "Observation",
     "observation-lab": "Observation",
     "patient": "Patient",
@@ -367,196 +366,16 @@ def lang2fhir_and_search(
         }
 
 
-def list_todoist_projects() -> dict:
-    """Lists all Todoist projects with their IDs and names.
-    
-    Returns:
-        dict: Result with status and projects list or error message.
-    """
-    try:
-        # Get Todoist API token from environment variables
-        todoist_token = os.environ.get("TODOIST_TOKEN")
-        
-        if not todoist_token:
-            return {
-                "status": "error",
-                "error_message": "TODOIST_TOKEN environment variable not set"
-            }
-            
-        # Set Todoist API URL and headers
-        todoist_api_url = "https://api.todoist.com/rest/v2/projects"
-        todoist_headers = {
-            "Authorization": f"Bearer {todoist_token}",
-            "Content-Type": "application/json"
-        }
-        
-        # Execute the request to the Todoist API
-        todoist_response = requests.get(todoist_api_url, headers=todoist_headers)
-        
-        todoist_response.raise_for_status()
-        
-        projects = todoist_response.json()
-        
-        # Format the projects for easier reading
-        formatted_projects = []
-        for project in projects:
-            formatted_projects.append({
-                "id": project.get("id"),
-                "name": project.get("name"),
-                "color": project.get("color", ""),
-                "is_favorite": project.get("is_favorite", False),
-                "is_shared": project.get("is_shared", False),
-                "view_count": project.get("view_count", 0)
-            })
-        
-        return {
-            "status": "success",
-            "projects": formatted_projects
-        }
-    except Exception as e:
-        return {
-            "status": "error",
-            "error_message": f"Failed to list Todoist projects: {str(e)}"
-        }
-
-
-def list_todoist_tasks(
-    project_id: str
-) -> dict:
-    """Lists tasks for a specific Todoist project.
-    
-    Args:
-        project_id (str): The ID of the Todoist project to list tasks for.
-        
-    Returns:
-        dict: Result with status and task list or error message.
-    """
-    try:
-        # Get Todoist API token from environment variables
-        todoist_token = os.environ.get("TODOIST_TOKEN")
-        
-        if not todoist_token:
-            return {
-                "status": "error",
-                "error_message": "TODOIST_TOKEN environment variable not set"
-            }
-            
-        # Set Todoist API URL and headers
-        todoist_api_url = "https://api.todoist.com/rest/v2/tasks"
-        todoist_headers = {
-            "Authorization": f"Bearer {todoist_token}",
-            "Content-Type": "application/json"
-        }
-        
-        # Add project_id as a query parameter
-        params = {"project_id": project_id}
-        
-        # Execute the request to the Todoist API
-        todoist_response = requests.get(todoist_api_url, headers=todoist_headers, params=params)
-        
-        todoist_response.raise_for_status()
-        
-        tasks = todoist_response.json()
-        
-        return {
-            "status": "success",
-            "project_id": project_id,
-            "tasks": tasks
-        }
-    except Exception as e:
-        return {
-            "status": "error",
-            "error_message": f"Failed to list Todoist tasks: {str(e)}"
-        }
-
-
-def create_todoist_task(
-    content: str,
-    project_id: str,
-    due_string: Optional[str] = None,
-    priority: Optional[int] = None,
-    description: Optional[str] = None,
-    labels: Optional[List[str]] = None
-) -> dict:
-    """Creates a task in a specific Todoist project.
-    
-    Args:
-        content (str): The task content/title.
-        project_id (str): The ID of the Todoist project to create the task in.
-        due_string (str, optional): Human-readable due date, e.g. "tomorrow", "next Monday".
-        priority (int, optional): Task priority from 1 (normal) to 4 (urgent).
-        description (str, optional): Detailed description of the task.
-        labels (List[str], optional): List of label names to apply to the task.
-        
-    Returns:
-        dict: Result with status and created task data or error message.
-    """
-    try:
-        # Get Todoist API token from environment variables
-        todoist_token = os.environ.get("TODOIST_TOKEN")
-        
-        if not todoist_token:
-            return {
-                "status": "error",
-                "error_message": "TODOIST_TOKEN environment variable not set"
-            }
-            
-        # Set Todoist API URL and headers
-        todoist_api_url = "https://api.todoist.com/rest/v2/tasks"
-        todoist_headers = {
-            "Authorization": f"Bearer {todoist_token}",
-            "Content-Type": "application/json"
-        }
-        
-        # Prepare the payload
-        payload = {
-            "content": content,
-            "project_id": project_id
-        }
-        
-        # Add optional parameters if provided
-        if due_string:
-            payload["due_string"] = due_string
-            
-        if priority:
-            payload["priority"] = priority
-            
-        if description:
-            payload["description"] = description
-            
-        if labels:
-            payload["labels"] = labels
-        
-        # Execute the request to the Todoist API
-        todoist_response = requests.post(todoist_api_url, headers=todoist_headers, json=payload)
-        
-        todoist_response.raise_for_status()
-        
-        created_task = todoist_response.json()
-        
-        return {
-            "status": "success",
-            "project_id": project_id,
-            "created_task": created_task
-        }
-    except Exception as e:
-        return {
-            "status": "error",
-            "error_message": f"Failed to create Todoist task: {str(e)}"
-        }
-
-
 root_agent = Agent(
     name="phenoml_fhir_agent",
     model="gemini-2.0-flash",
     description=(
-        "Agent to convert natural language to FHIR resources and queries using PhenoML lang2fhir API, "
-        "and manage Todoist tasks."
+        "Agent to convert natural language to FHIR resources and queries using PhenoML lang2fhir API."
     ),
     instruction=(
         "You are a helpful agent who can create FHIR resources from natural language descriptions and "
         "search for FHIR resources using natural language queries through PhenoML's lang2fhir API. "
-        "You can also perform direct FHIR operations on a FHIR server and manage Todoist tasks. "
+        "You can also perform direct FHIR operations on a FHIR server. "
         "Available FHIR profiles include: " +
         ", ".join(FHIR_PROFILES.keys()) + "\n\n"
         
@@ -565,15 +384,12 @@ root_agent = Agent(
         "handling relative dates like 'tomorrow' or 'next week'.\n\n"
         
         "IMPORTANT: When a user asks a question or makes a request, follow these steps:\n"
-        "1. TRANSLATE the user's intent into relevant FHIR concepts or Todoist operations\n"
-        "2. DETERMINE which FHIR resources are needed (Patient, Appointment, Condition, etc.) or if Todoist tasks need to be managed\n"
-        "3. DECIDE whether to search for existing resources/tasks or create new ones\n"
+        "1. TRANSLATE the user's intent into relevant FHIR concepts\n"
+        "2. DETERMINE which FHIR resources are needed (Patient, Appointment, Condition, etc.)\n"
+        "3. DECIDE whether to search for existing resources or create new ones\n"
         "4. USE the appropriate tool:\n"
         "   - lang2fhir_and_search: When looking for clinical data or other resources\n"
-        "   - lang2fhir_and_create: When creating new clinical data or resources\n"
-        "   - list_todoist_projects: When the user needs to find out which Todoist projects are available\n"
-        "   - list_todoist_tasks: When listing tasks for a Todoist project\n"
-        "   - create_todoist_task: When creating a new task in a Todoist project\n\n"
+        "   - lang2fhir_and_create: When creating new clinical data or resources\n\n"
         
         "CRITICAL PATIENT WORKFLOW: When a user mentions a patient by name (not ID):\n"
         "1. FIRST use lang2fhir_and_search to find the patient by name (e.g., 'Find patient John Smith')\n"
@@ -596,13 +412,6 @@ root_agent = Agent(
         "   c. location_id parameter with the location's ID\n"
         "7. Use natural language to describe the appointment clearly in the description\n"
         "8. The tool will automatically handle adding the location to supportingInformation for Canvas\n\n"
-        
-        "TODOIST WORKFLOW: When managing Todoist tasks:\n"
-        "1. FIRST use list_todoist_projects to show all available projects and their IDs\n"
-        "2. For listing tasks, use the list_todoist_tasks function with the project_id\n"
-        "3. For creating tasks, use the create_todoist_task function with required details\n"
-        "4. When creating tasks, specify all relevant details like due dates and priorities\n"
-        "5. If the user mentions a project by name but not ID, first find the project ID, then proceed\n\n"
         
         "PROVIDER AVAILABILITY WORKFLOW: When checking if a provider is available:\n"
         "1. FIRST use lang2fhir_and_search to find the practitioner by name to get practitioner ID\n"
@@ -643,21 +452,6 @@ root_agent = Agent(
         "    * profile='appointment'\n"
         "    * description='Appointment for John with Dr. Smith tomorrow at 2 PM for check-up'\n\n"
         
-        "For example, if user says 'Show me my Todoist projects':\n"
-        "  - Use list_todoist_projects to get all projects and their IDs\n\n"
-        
-        "For example, if user says 'List my Todoist tasks for the Health project':\n"
-        "  - First: Use list_todoist_projects to find the project ID for 'Health'\n"
-        "  - Then: Use list_todoist_tasks with the found project_id\n\n"
-        
-        "For example, if user says 'Create a task to follow up with patient Jane in my Todoist health project':\n"
-        "  - First: Use list_todoist_projects to find the project ID for 'Health'\n"
-        "  - Then: Use create_todoist_task with:\n"
-        "    * content='Follow up with patient Jane'\n"
-        "    * project_id=(the ID found for the Health project)\n"
-        "    * due_string='tomorrow'\n"
-        "    * priority=3\n\n"
-        
         "For lang2fhir_and_create: When creating resources, select the most appropriate profile based on the description. "
         "For example:\n"
         "- For diagnoses made during visits: 'condition-encounter-diagnosis'\n"
@@ -693,8 +487,5 @@ root_agent = Agent(
     tools=[
         lang2fhir_and_create,
         lang2fhir_and_search,
-        list_todoist_projects,
-        list_todoist_tasks,
-        create_todoist_task,
     ],
 )
