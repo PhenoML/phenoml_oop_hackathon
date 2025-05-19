@@ -8,6 +8,9 @@ Demo of an agent that you can build using this repo!
 
 ![PhenoML FHIR Agent Demo](202505131555.gif)
 
+### OOP Hackathon Demo App
+Check out [this fork](https://github.com/kerbearasaurus/phenoml_oop_hackathon) for Carely, the entire AI caregiver app we built during the OOP Hackathon: includes an agent built for EHR workflows powered by PhenoML, and task management with Todoist and Google Maps support! 
+
 ## Features
 
 - Convert natural language descriptions to FHIR resources using PhenoML's lang2fhir API
