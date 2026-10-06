@@ -20,7 +20,7 @@ Check out [this fork](https://github.com/kerbearasaurus/phenoml_oop_hackathon) f
 
 ## Prerequisites
 
-1. [PhenoML](https://developer.pheno.ml) account with access to the lang2fhir API
+1. [PhenoML](https://console.pheno.ml/docs/guides/quickstart) account with access to the lang2fhir API
 2. [Medplum](https://medplum.com) or [Canvas Medical](https://www.canvasmedical.com/emrs/developer-sandbox) account (or other FHIR server) for storing created resources and executing FHIR searches
 3. Python 3.8+
 4. Gemini API access: sign up for a Gemini API key [here](https://ai.google.dev/gemini-api/docs/api-key) 
@@ -85,7 +85,7 @@ This agent uses PhenoML's lang2fhir API, which provides:
 - **Create endpoint**: Converts natural language to structured FHIR resources
 - **Search endpoint**: Converts natural language to FHIR search parameters
 
-For more information, visit: [PhenoML Documentation](https://developer.pheno.ml)
+For more information, visit: [PhenoML Documentation](https://console.pheno.ml/docs)
 
 ## License
 
